@@ -1,0 +1,56 @@
+nav .navbar-brand
+{
+    /* size for brand */
+    font-size: xx-large;
+}
+
+
+/* Colors for brand */
+nav .navbar-brand .logo
+{
+    color: white;
+}
+nav .navbar-nav li a
+{
+    color: white !important;
+}
+nav .navbar-nav li a:hover
+{
+    text-decoration:underline;
+}
+#quote-text
+{
+    color: black;
+    font-size: 20px;
+}
+
+main .form-control
+{
+    /* Center form controls */
+    display: inline-block;
+
+    /* Override Bootstrap's 100% width for form controls */
+    width: auto;
+}
+
+body
+{
+    background-image: url(https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80);
+    background-size: 100% 120vh;
+    background-repeat: no-repeat;
+
+}
+main
+{
+    /* Scroll horizontally as needed */
+    overflow-x: auto;
+
+    /* Center contents */
+    text-align: center;
+}
+
+main img
+{
+    /* Constrain images on small screens */
+    max-width: 100%;
+}
