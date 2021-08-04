@@ -5,7 +5,25 @@
 {% endblock %}
 
 {% block main %}
-<table>
-    <p>hello</p>
+<table class="table table-striped">
+    <thead>
+        <tr>Symbol</tr>
+        <tr>Name</tr>
+        <tr>Shares</tr>
+        <tr>Price</tr>
+        <tr>Total</tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <td colspan="4"></td>
+            <td>{{cash_total}}</td>
+        </tr>
+    </tfoot>
+    <tbody>
+        {{for element in table}}
+            <tr>
+                <td>{{element["symbol"]}}</td>
+            </tr>
+    </tbody>
 </table>
 {% endblock %}
