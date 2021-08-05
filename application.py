@@ -165,18 +165,18 @@ def quote():
     """Get stock quote."""
     if request.method == "POST":
         if not request.form.get("symbol"):
-            return apology("must provide a stock symbol", 403)
+            return apology("must provide a stock symbol", 400)
         stock_symbol = request.form.get("symbol").upper()
         stock = lookup(stock_symbol)
+        if not stock:
+            return apology("invalid stock symbol", 400)
         stock_data={
                 'name': stock['name'],
                 'symbol': stock['symbol'],
                 'price': usd(stock['price'])
             }
-        if not stock:
-            return apology("invalid stock symbol", 400)
-        else:
-            return render_template("quoted.html", stock_data=stock_data)
+        return render_template("quoted.html", stock_data=stock_data)
+
     if request.method == "GET":
         return render_template("quote.html")
 
@@ -190,19 +190,19 @@ def register():
         hashed_password = generate_password_hash(request.form.get("password"))
         # Ensure username was submitted
         if not request.form.get("username"):
-            return apology("must provide username", 403)
+            return apology("must provide username", 400)
         # Ensure password was submitted
         elif not request.form.get("password"):
-            return apology("must provide password", 403)
+            return apology("must provide password", 400)
         elif not request.form.get("confirmation"):
-            return apology("must confirm password", 403)
+            return apology("must confirm password", 400)
         elif request.form.get("password") != request.form.get("confirmation"):
-            return apology("passwords must match", 403)
+            return apology("passwords must match", 400)
         try:
             db.execute("INSERT INTO users (username, hash) VALUES(?, ?)", username, hashed_password)
             return redirect("/login")
         except:
-            return apology("username already exists", 403)
+            return apology("username already exists", 400)
 
     else:
         return render_template("register.html")
