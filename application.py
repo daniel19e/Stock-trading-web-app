@@ -78,7 +78,7 @@ def buy():
     """Buy shares of stock"""
     if request.method == "POST":
         stock_symbol = request.form.get("symbol").upper()
-        shares = int(request.form.get("shares"))
+        shares = request.form.get("shares")
         stock = lookup(stock_symbol)
 
         if not request.form.get("symbol"):
@@ -91,7 +91,7 @@ def buy():
             return apology("invalid stock symbol", 400)
         db_rows = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])
         initial_cash = db_rows[0]["cash"]
-        current_cash = initial_cash - shares * stock["price"]
+        current_cash = initial_cash - int(shares) * stock["price"]
         if current_cash < 0:
             return apology("cannot afford")
         db.execute("UPDATE users SET cash=? WHERE id=?", current_cash, session["user_id"])
