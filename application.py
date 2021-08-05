@@ -212,7 +212,49 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock"""
-    return render_template("sell.html")
+    if request.method == "POST":
+        stock_symbol = request.form.get("symbol").upper()
+        shares = request.form.get("shares")
+        stock = lookup(stock_symbol)
+
+        if not request.form.get("symbol"):
+            return apology("must provide a stock symbol", 403)
+        if not request.form.get("shares"):
+            return apology("must provide number of shares", 403)
+        elif not request.form.get("shares").isdigit():
+            return apology("invalid number of shares")
+        if not stock:
+            return apology("invalid stock symbol", 400)
+
+        db.execute("""
+            SELECT SUM(shares) AS total
+            FROM transactions
+            WHERE""")
+
+        db_rows = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])
+        initial_cash = db_rows[0]["cash"]
+        current_cash = initial_cash + int(shares) * stock["price"]
+        if current_cash < 0:
+            return apology("cannot afford")
+        db.execute("UPDATE users SET cash=? WHERE id=?", current_cash, session["user_id"])
+        db.execute("""
+            INSERT INTO transactions (user_id, symbol, shares, price)
+            VALUES (?, ?, ?, ?)""", session["user_id"], stock["symbol"], shares, stock["price"])
+        flash("Transaction completed successfully!")
+        return redirect("/")
+
+    else:
+        rows = db.execute("""
+        SELECT symbol
+        FROM transactions
+        WHERE user_id=?
+        GROUP BY symbol
+        HAVING SUM(shares) > 0;""", session["user_id"])
+        symbols = []
+        for row in rows:
+            symbols.append(row["symbol"])
+
+        return render_template("sell.html", symbols=symbols)
 
 
 def errorhandler(e):
