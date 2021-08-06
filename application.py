@@ -226,21 +226,26 @@ def sell():
         if not stock:
             return apology("invalid stock symbol", 400)
 
-        db.execute("""
-            SELECT SUM(shares) AS total
+        symbols_and_shares = db.execute("""
+            SELECT symbol, SUM(shares) AS total
             FROM transactions
-            WHERE""")
+            WHERE user_id=?
+            GROUP BY symbol
+            HAVING total>0;""", session["user_id"])
+        for item in symbols_and_shares:
+            if item["symbol"] == stock_symbol:
+                if int(shares) > item["total"]:
+                    return apology("incorrect amount of shares")
 
         db_rows = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])
         initial_cash = db_rows[0]["cash"]
         current_cash = initial_cash + int(shares) * stock["price"]
-        if current_cash < 0:
-            return apology("cannot afford")
+
         db.execute("UPDATE users SET cash=? WHERE id=?", current_cash, session["user_id"])
         db.execute("""
             INSERT INTO transactions (user_id, symbol, shares, price)
-            VALUES (?, ?, ?, ?)""", session["user_id"], stock["symbol"], shares, stock["price"])
-        flash("Transaction completed successfully!")
+            VALUES (?, ?, ?, ?)""", session["user_id"], stock["symbol"], -1*int(shares), stock["price"])
+        flash("Shares sold successfully!")
         return redirect("/")
 
     else:
