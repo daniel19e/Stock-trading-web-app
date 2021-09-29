@@ -47,11 +47,11 @@ if not os.environ.get("API_KEY"):
 def index():
     """Show portfolio of stocks"""
     rows = db.execute("""
-    SELECT symbol, SUM(shares) AS total
+    SELECT symbol, SUM(shares)
     FROM transactions
     WHERE user_id = ?
     GROUP BY symbol
-    HAVING total > 0;
+    HAVING SUM(shares) > 0;
     """, session["user_id"])
     cash_row = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])
     table = []
