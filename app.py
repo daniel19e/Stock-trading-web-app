@@ -35,7 +35,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = SQL(os.getenv("DATABASE_URL"))
+db = SQL("sqlite:///finance.db")
 
 # Make sure API key is set
 if not os.environ.get("API_KEY"):
@@ -47,11 +47,11 @@ if not os.environ.get("API_KEY"):
 def index():
     """Show portfolio of stocks"""
     rows = db.execute("""
-    SELECT symbol, SUM(shares)
+    SELECT symbol, SUM(shares) AS total
     FROM transactions
     WHERE user_id = ?
     GROUP BY symbol
-    HAVING SUM(shares) > 0;
+    HAVING total > 0;
     """, session["user_id"])
     cash_row = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])
     table = []
@@ -236,11 +236,11 @@ def sell():
             return apology("invalid stock symbol", 400)
 
         symbols_and_shares = db.execute("""
-            SELECT symbol, SUM(shares)
+            SELECT symbol, SUM(shares) AS total
             FROM transactions
             WHERE user_id=?
             GROUP BY symbol
-            HAVING SUM(shares)>0;""", session["user_id"])
+            HAVING total>0;""", session["user_id"])
         for item in symbols_and_shares:
             if item["symbol"] == stock_symbol:
                 if int(shares) > item["total"]:
