@@ -236,11 +236,11 @@ def sell():
             return apology("invalid stock symbol", 400)
 
         symbols_and_shares = db.execute("""
-            SELECT symbol, SUM(shares) AS total
+            SELECT symbol, SUM(shares)
             FROM transactions
             WHERE user_id=?
             GROUP BY symbol
-            HAVING total>0;""", session["user_id"])
+            HAVING SUM(shares)>0;""", session["user_id"])
         for item in symbols_and_shares:
             if item["symbol"] == stock_symbol:
                 if int(shares) > item["total"]:
